@@ -1,9 +1,32 @@
-var express = require('express');
-var Webtask = require('webtask-tools');
+const path = require('path');
 const nconf = require('nconf');
+const logger = require('./server/lib/logger');
 
-var app = express();
+// eslint-disable-next-line import/no-extraneous-dependencies
+require('@babel/register')({
+  ignore: [ /node_modules/ ],
+  sourceMaps: !(process.env.NODE_ENV === 'production'),
+  plugins: [
+    '@babel/plugin-proposal-export-default-from',
+    '@babel/plugin-proposal-object-rest-spread'
+  ],
+  presets: [
+    [ '@babel/env', {
+      targets: {
+        node: 'current'
+      }
+    } ]
+  ]
+});
+// eslint-disable-next-line import/no-extraneous-dependencies
+require('@babel/polyfill');
 
+// Handle uncaught.
+process.on('uncaughtException', (err) => {
+  logger.error(err);
+});
+
+// Initialize configuration.
 nconf
   .argv()
   .env()
@@ -16,10 +39,8 @@ nconf
     EXTENSION_SECRET: 'secret'
   });
 
-app.get('/', function (req, res) {
-  res.status(200).send('Hello World');
-});
-
+// Start the server.
+const app = require('./server')((key) => nconf.get(key), null);
 const port = nconf.get('PORT');
 
 app.listen(port, (error) => {
