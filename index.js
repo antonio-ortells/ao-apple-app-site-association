@@ -29,7 +29,7 @@ app.get('/some.file', function (req, res) {
 
 app.get('/*', function (req, res) {
   var newurl = `${BASEURL}${req.url}`;
-  request(newurl).pipe(res);
+  res.redirect(newurl);
 });
 
 app.listen(port, () => {
