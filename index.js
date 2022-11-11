@@ -25,8 +25,8 @@ app.get('/', function (req, res) {
 });
 
 app.get('/*', function (req, res) {
-  console.log(`Requested ${req.url}`)
-  var newurl = `${BASEURL}${req.url}`;
+  console.log(`Requested ${req.originalUrl}`)
+  var newurl = `${BASEURL}${req.originalUrl}`;
   res.redirect(newurl);
 });
 
